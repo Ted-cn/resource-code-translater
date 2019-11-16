@@ -34,8 +34,17 @@
  */
 
 /**
+ * synchronized和Lock有什么区别？用新的Lock有什么好处？举例说说。
  *
- *
+ * 1. 原始构成
+ *     synchronize是关键字属于JVM层面
+ *         monitorenter/monitorexit（底层是通过monitor对象来完成，其实wait/notify等方法也依赖monitor对象，
+ *         只有在同步块或方法中才能调用wait/notify等方法）
+ *     Lock是具体类（java.util.concurrent.locks.Lock）是api层面的锁
+ * 2. 使用方法
+ *     synchronized不需要用户手动释放锁，当synchronized代码执行完成后系统会自动让线程释放对锁的占用
+ *     ReentrantLock则需要用户手动释放锁，若没有，则有可能出现死锁现象。（需要lock()和unlock()方法配合
+ *     try/finally语句块来完成。）
  *
  *
  */

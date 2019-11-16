@@ -9,5 +9,6 @@ public class Hello {
         Lock lock = new ReentrantLock();
 
         System.out.println(lock);
+        System.out.println("1");
     }
 }

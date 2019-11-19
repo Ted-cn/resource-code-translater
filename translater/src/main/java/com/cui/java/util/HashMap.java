@@ -196,45 +196,66 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *
      * Most methods try to use normal bins, but relay to TreeNode methods when applicable
      * (simply by checking instanceof a node).
+     * 大多数方法会使用通常的bins，但会在合适的时候转变为TreeNode（只需要检查node的类型即可）。
      *
      * Bins of TreeNodes may be traversed and used like any others,
      * but additionally support faster lookup when overpopulated.
+     * 树节点的bins，可以像其他种类的节点一样被遍历和使用，但在节点过剩里，它提供更快的查询速度。
      *
      * However, since the vast majority of bins in normal use are not overpopulated,
      * checking for existence of tree bins may be delayed in the course of table methods.
+     * 然而，由于大多数的bins并没有过剩，在方法调用过程中，检查是否存在binsTree的工作可能会被延迟。
      *
      * Tree bins (i.e., bins whose elements are all TreeNodes) are ordered primarily by hashCode,
      * but in the case of ties, if two elements are of the same "class C implements Comparable<C>",
-     * type then their compareTo method is used for ordering. (We
-     * conservatively check generic types via reflection to validate
-     * this -- see method comparableClassFor).
+     * type then their compareTo method is used for ordering.
+     * Tree bins（即所有元素都是树节点的bins）主要是通过哈希码来排序的，但是，
+     * 对于树节点，如果两个元素是同一种实现了Comparable<C>接口的类型，那么就按照他们的排序方法来排序。
+     *
+     * (We conservatively check generic types via reflection to validate this
+     * -- see method comparableClassFor).
+     * （我们通过反射来保守地检查范型类型以确保这点。
+     * -- 见comparableClassFor()方法）
      *
      * The added complexity of tree bins is worthwhile in providing worst-case O(log n) operations
      * when keys either have distinct hashes or are orderable,
+     * 当键要么有独特的哈希码，要么是有序的，
+     * 它提供了最差的时间复杂度O(log n)操作时，，tree bins产生的复杂度是值得的，
+     *
      * Thus, performance degrades gracefully under accidental or
      * malicious usages in which hashCode() methods return values that are poorly distributed,
-     * as well as those in which many keys share a hashCode,
-     * so long as they are also Comparable. (If neither of these apply, we may waste about a
-     * factor of two in time and space compared to taking no
-     * precautions.
+     * as well as those in which many keys share a hashCode, so long as they are also Comparable.
+     * 因此，当无意地或恶意地使用返回低分散的hashCode()方法，或者多个key共用同一个hashCode,
+     * 只要他们实现了Comparable<C>接口，性能只会缓慢地下降。
      *
-     * But the only known cases stem from poor user
-     * programming practices that are already so slow that this makes
-     * little difference.)
+     * (If neither of these apply, we may waste about a factor of two in time and space
+     * compared to taking no precautions.But the only known cases stem from poor user
+     * programming practices that are already so slow that this makes little difference.)
+     * 如果上述情况都没有发生，相较于不作预防措施而言，我们可能会浪费时间或空间其中之一。
+     * 但是，已知的唯一案例源于糟糕的用户编程实践，这些实践已经非常缓慢，这几乎没有什么区别。
      *
-     * Because TreeNodes are about twice the size of regular nodes, we
-     * use them only when bins contain enough nodes to warrant use
-     * (see TREEIFY_THRESHOLD). And when they become too small (due to
-     * removal or resizing) they are converted back to plain bins.  In
-     * usages with well-distributed user hashCodes, tree bins are
-     * rarely used.  Ideally, under random hashCodes, the frequency of
-     * nodes in bins follows a Poisson distribution
-     * (http://en.wikipedia.org/wiki/Poisson_distribution) with a
-     * parameter of about 0.5 on average for the default resizing
-     * threshold of 0.75, although with a large variance because of
-     * resizing granularity. Ignoring variance, the expected
-     * occurrences of list size k are (exp(-0.5) * pow(0.5, k) /
-     * factorial(k)). The first values are:
+     * Because TreeNodes are about twice the size of regular nodes,
+     * we use them only when bins contain enough nodes to warrant use (see TREEIFY_THRESHOLD).
+     * 因为树节点大概是普通节点的两倍大小，所以我们只在桶需要保证装足够多的时候才会使用。（见TREEIFY_THRESHOLD 树化阈值）
+     *
+     * And when they become too small (due to removal or resizing) they are converted back to plain bins.
+     * 并且当树节点变小时（由于移除或调用），他们会转换回普通桶。
+     *
+     * In usages with well-distributed user hashCodes, tree bins are rarely used.
+     * 在hashCode均匀分布时，树状桶是很少被使用的。
+     *
+     * Ideally, under random hashCodes,
+     * the frequency of nodes in bins follows a Poisson distribution (http://en.wikipedia.org/wiki/Poisson_distribution)
+     * with a parameter of about 0.5 on average for the default resizin threshold of 0.75,
+     * although with a large variance because of resizing granularity.
+     * 291/5000
+     * 理想情况下，hashCode随机产生，桶中节点的分页遵循泊松分布(http://en.wikipedia.org/wiki/Poisson_distribution)，
+     * 默认的resizin阈值为0.75，平均参数约为0.5，尽管由于调整粒度而存在较大的差异。
+     *
+     * Ignoring variance, the expected occurrences of list size k are (exp(-0.5) * pow(0.5, k) / factorial(k)).
+     * 忽略方差，列表大小k的预期出现次数是(exp(-0.5) * pow(0.5, k) / factorial(k))。
+     *
+     * The first values are:
      *
      * 0:    0.60653066
      * 1:    0.30326533
@@ -282,18 +303,21 @@ public class HashMap<K,V> extends AbstractMap<K,V>
 
     /**
      * The default initial capacity - MUST be a power of two.
+     * 默认的初始容量 - 必须是2的幂
      */
     static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16
 
     /**
-     * The maximum capacity, used if a higher value is implicitly specified
-     * by either of the constructors with arguments.
+     * The maximum capacity, used if a higher value is implicitly specified by either of the constructors with arguments.
+     * 最大容量，当一个更大的值通过构造函数的参数被隐式地指定使用。
      * MUST be a power of two <= 1<<30.
+     * 必须是2的幂
      */
     static final int MAXIMUM_CAPACITY = 1 << 30;
 
     /**
      * The load factor used when none specified in constructor.
+     * 加载因子，当构造函数中没有指定时使用。
      */
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
 

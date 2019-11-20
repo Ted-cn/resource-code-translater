@@ -10,6 +10,6 @@ public class Hello {
     public static void main(String[] args) {
         Map<String, Object> hashMap = new HashMap<>();
         Lock lock = new ReentrantLock();
-        System.out.println("123")
+        System.out.println("123");
     }
 }
